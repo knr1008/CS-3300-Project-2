@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>Profile</title>
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:300,400,700">
+    <link rel="stylesheet" href="assets/fonts/ionicons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.6.1/css/pikaday.min.css">
+    <link rel="stylesheet" href="assets/css/Login-Form-Clean.css">
+    <link rel="stylesheet" href="assets/css/Login-Form-Dark.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+
+</head>
+
+<body><nav class="navbar navbar-dark navbar-expand-lg fixed-top portfolio-navbar" style="background-color: black;padding: 15.2px -21px;">
+        <div class="container">
+            <a class="forgot" style="font-size: small;">
+                <img src="assets/img/buzz.png" style="width: 75px;"><button data-toggle="collapse" class="navbar-toggler" data-target="#navbarNav" style="border-color: rgb(207,181,59);"><span class="sr-only">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
+            </a>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="nav navbar-nav ml-auto">
+                    <li class="nav-item" role="presentation"><form class="nav-link" action="/home" method="get"><button class="nav-link" style="color: rgb(207,181,59)">Marketplace</button></form></li>
+                    <li class="nav-item" role="presentation"><form class="nav-link" action="/myposts" method="get"><button class="nav-link" style="color: rgb(207,181,59)">My Posts</button></form></li>
+                    <li class="nav-item" role="presentation"><form class="nav-link" action="/profile" method="get"><button class="nav-link" style="color: rgb(207,181,59)">Profile</button></form></li>
+                    <li class="nav-item" role="presentation"><form class="nav-link" action="/logout" method="get"><button class="nav-link" style="color: rgb(207,181,59)">Log Out</button></form></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <main class="page contact-page">
+        <section class="portfolio-block contact">
+            <div class="container">
+                <div class="heading">
+                    <h2 style="color: rgb(207,181,59)">My Profile</h2>
+                </div>
+                <div id="alerts"></div>
+                <form action="update-info.html" style="margin: 20px auto;">
+                    <div class="form-group"><label for="email">Email</label><input class="form-control item" type="email" id="email" disabled=""></div>
+                    <div class="form-group"><label for="subject">First Name</label><input class="form-control" type="text" id="firstname" disabled=""></div>
+                    <div class="form-group"><label for="subject">Last Name</label><input class="form-control" type="text" id="lastname" disabled=""></div>
+                    <div class="form-group"><label for="message">Phone</label><input class="form-control" type="tel" id="phone" disabled=""></div>
+                    <div class="form-group"><button class="btn btn-outline-warning btn-block btn-lg" type="submit">Change Information</button></div>
+                </form>
+            </div>
+            <div class="container">
+                <form action="update-password.html" style="margin: 20px auto;">
+                    <div class="form-group"><label for="subject">Password</label><input class="form-control" type="password" id="password" disabled=""></div>
+                    <div class="form-group"><button class="btn btn-outline-warning btn-block btn-lg" type="submit">Change Password</button></div>
+                </form>
+            </div>
+            <br>
+        </section>
+    </main>
+
+    <footer class="page-footer font-small indigo" style="background-color: black;">
+        <div class="container">
+          <div class="row text-center d-flex justify-content-center pt-5 mb-3">
+            <div class="col-md-2 mb-3">
+              <h6 class="text-uppercase font-weight-bold">
+                <form class="nav-link" action="/home" method="get"><button style="color: rgb(207,181,59)">Marketplace</button></form>
+              </h6>
+            </div>
+            <div class="col-md-2 mb-3">
+              <h6 class="text-uppercase font-weight-bold">
+                <form class="nav-link" action="/myposts" method="get"><button style="color: rgb(207,181,59)">My Posts</button></form>
+              </h6>
+            </div>
+            <div class="col-md-2 mb-3">
+              <h6 class="text-uppercase font-weight-bold">
+                <form class="nav-link" action="/profile" method="get"><button style="color: rgb(207,181,59)">Profile</button></form>
+              </h6>
+            </div>
+            <div class="col-md-2 mb-3">
+              <h6 class="text-uppercase font-weight-bold">
+                <form class="nav-link" action="/logout" method="get"><button style="color: rgb(207,181,59)">Logout</button></form>
+              </h6>
+            </div>
+          </div>
+        </div>
+      </footer>
+
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.6.1/pikaday.min.js"></script>
+    <script src="assets/js/theme.js"></script>
+    <script>
+        $(document).ready(function(){
+            $.get("/pull_profile", function(data, status){
+                data.forEach((d) => {
+                    document.getElementById('firstname').value = d.firstName;
+                    document.getElementById('lastname').value = d.lastName;
+                    document.getElementById('email').value = d.email;
+                    document.getElementById('phone').value = d.phoneNumber;
+                });
+            });
+
+            $.get("/pull_alerts", function(data, status){
+                var header = $("#alerts");
+                data.forEach((d) => {
+                    header.after("<div class=\"alert alert-" + d.type + "\" role=\"alert\" style=\"margin: 10px auto; width: 50%;\"><strong>" + d.alert + "</strong><span class=\"close\" onclick=\"this.parentElement.style.display='none';\">&times;</span></div>");
+                });
+            });
+
+        
+        });
+    </script>
+</body>
+
+</html>

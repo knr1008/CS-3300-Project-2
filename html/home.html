@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>Home</title>
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:300,400,700">
+    <link rel="stylesheet" href="assets/fonts/ionicons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.6.1/css/pikaday.min.css">
+    <link rel="stylesheet" href="assets/css/Login-Form-Clean.css">
+    <link rel="stylesheet" href="assets/css/Login-Form-Dark.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+
+<body><nav class="navbar navbar-dark navbar-expand-lg fixed-top portfolio-navbar" style="background-color: black;padding: 15.2px -21px;">
+        <div class="container">
+            <a class="forgot" style="font-size: small;">
+                <img src="assets/img/buzz.png" style="width: 75px;"><button data-toggle="collapse" class="navbar-toggler" data-target="#navbarNav" style="border-color: rgb(207,181,59);"><span class="sr-only">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
+            </a>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="nav navbar-nav ml-auto">
+                    <li class="nav-item" role="presentation"><form class="nav-link" action="/home" method="get"><button class="nav-link" style="color: rgb(207,181,59)">Marketplace</button></form></li>
+                    <li class="nav-item" role="presentation"><form class="nav-link" action="/myposts" method="get"><button class="nav-link" style="color: rgb(207,181,59)">My Posts</button></form></li>
+                    <li class="nav-item" role="presentation"><form class="nav-link" action="/profile" method="get"><button class="nav-link" style="color: rgb(207,181,59)">Profile</button></form></li>
+                    <li class="nav-item" role="presentation"><form class="nav-link" action="/logout" method="get"><button class="nav-link" style="color: rgb(207,181,59)">Log Out</button></form></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <main class="page cv-page">
+        <section class="portfolio-block block-intro" style="padding: 32px;padding-top: 70px;padding-bottom: 40px;">
+            <div class="container" style="background-color: #ffffff;padding: 0px 20px;padding-right: 1px;">
+                
+                    <form method="post" action="/submit_post">
+                        <div class="heading" id="create">
+                            <h2 class="text-center" style="color: rgb(207,181,59)">Create a Post</h2>
+                        </div>
+                        <div class="heading" id="create">
+                            <h5 class="text-center">Upload an Image</h5>
+                        </div>
+                        <label>Description</label>
+                        <textarea name="postText" style="height: 100px; color: rgb(207,181,59)"class="form-control" placeholder="Write something...." required></textarea>
+                        <label>Contact Choice</label>
+                        <div class="form-group">
+                            <select class="form-control" required>
+                                <option value="Email">Email</option>
+                                <option value="Phone">Phone Number</option>
+                                <option value="Both">Both</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-outline-warning" type="submit" style="padding-top: 6px;margin-top: 30px; ">Post</button>
+                    </form>
+                
+            </div>
+        </section>
+        <section class="portfolio-block cv">
+            <div class="container">
+                <div class="work-experience group">
+                    <div class="heading" id="feed">
+                        <h2 class="text-center" style="color: rgb(207,181,59)">Buzz Marketplace</h2>
+                    </div>
+                    <!-- Individual posts will appear below buzz marketplace, they will display title and image. Clicking on a post will 
+                    bring the user to another page to see all of the details (title, image, description, contact info)-->
+                    <div class="heading">
+                        <h5 class="text-center" style="color: rgb(207,181,59)">Individual Post (Clickable)</h5>
+                        <h5 class="text-center" style="color: rgb(207,181,59)">Title</h5>
+                        <h5 class="text-center" style="color: rgb(207,181,59)">Image</h5>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+<footer class="page-footer font-small indigo" style="background-color: black;">
+    <div class="container">
+      <div class="row text-center d-flex justify-content-center pt-5 mb-3">
+        <div class="col-md-2 mb-3">
+          <h6 class="text-uppercase font-weight-bold">
+            <form class="nav-link" action="/home" method="get"><button style="color: rgb(207,181,59)">Marketplace</button></form>
+          </h6>
+        </div>
+        <div class="col-md-2 mb-3">
+          <h6 class="text-uppercase font-weight-bold">
+            <form class="nav-link" action="/myposts" method="get"><button style="color: rgb(207,181,59)">My Posts</button></form>
+          </h6>
+        </div>
+        <div class="col-md-2 mb-3">
+          <h6 class="text-uppercase font-weight-bold">
+            <form class="nav-link" action="/profile" method="get"><button style="color: rgb(207,181,59)">Profile</button></form>
+          </h6>
+        </div>
+        <div class="col-md-2 mb-3">
+          <h6 class="text-uppercase font-weight-bold">
+            <form class="nav-link" action="/logout" method="get"><button style="color: rgb(207,181,59)">Logout</button></form>
+          </h6>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.6.1/pikaday.min.js"></script>
+    <script src="assets/js/theme.js"></script>
+    <script>
+        $(document).ready(function(){
+            $.get("/pull_posts", function(data, status){
+                var heading = $("div#feed");
+                data.forEach((d) => {
+                    heading.after("<div class=\"item\" id=\"" + d.postId + "\"><div class=\"row\"><div class=\"avatar\" style=\"background-image:url(&quot;assets/img/avatars/avatar.jpg&quot;);\"></div><div class=\"col d-md-flex d-lg-flex justify-content-md-center align-items-md-center justify-content-lg-center align-items-lg-center\" style=\"height: 99px;\"><img src=\"assets/img/profile.png\" style=\"width: 65px;\"></div><div class=\"col-md-6 d-md-flex d-lg-flex justify-content-md-start align-items-md-center justify-content-lg-start align-items-lg-center\"><h3 class=\"text-left\" style=\"font-size: 20px;\">" + d.firstName + " " + d.lastName + "</h3></div><div class=\"col d-md-flex d-lg-flex justify-content-md-end align-items-md-center justify-content-lg-center align-items-lg-center\"><span class=\"d-lg-flex justify-content-lg-center align-items-lg-center period\" style=\"font-size: 15px;\">&nbsp;" + formatDate(d.postDate) + "</span></div></div><p class=\"text-muted\" style=\"font-size: 20px\">" + d.postText + "</p><form action=\"/posts\" method=\"post\" style=\"all: unset\"><input value=\"" + d.postId + "\" name=\"postId\" style=\"display: none\"></input><button style=\"background: transparent;border: none;\">See comments...</button></form></div>");
+                });
+                if (data.length == 0) {
+                    heading.after("<br><h5 class=\"no-result\">No posts</h5>");
+                }
+            });
+
+            $.get("/pull_alerts", function(data, status){
+                var heading = $("#create");
+                data.forEach((d) => {
+                    heading.after("<div class=\"alert alert-" + d.type + "\" role=\"alert\"><strong>" + d.alert + "</strong><span class=\"close\" onclick=\"this.parentElement.style.display='none';\">&times;</span></div>");
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>
