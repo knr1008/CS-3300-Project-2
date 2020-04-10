@@ -7,7 +7,7 @@ CREATE TABLE User (
 	lastName VARCHAR(50) NOT NULL,
     phoneNumber VARCHAR(50) NOT NULL,
     lastLogin timestamp default current_timestamp,
-	PRIMARY KEY (email, role)
+	PRIMARY KEY (email, title)
 );
 
 DELIMITER //
@@ -24,13 +24,13 @@ DELIMITER ;
 
 CREATE TABLE Posts (
 	email VARCHAR(50) NOT NULL,
-	role TINYINT NOT NULL,
+	title VARCHAR(50) NOT NULL,
     postId int NOT NULL auto_increment,
 	postText VARCHAR(300) NOT NULL,
 	postDate timestamp default current_timestamp,
 	PRIMARY KEY (postId),
-    FOREIGN KEY (email, role)
-		REFERENCES User (email, role)
+    FOREIGN KEY (email, title)
+		REFERENCES User (email, title)
 			ON DELETE CASCADE
 			ON UPDATE CASCADE
 );
