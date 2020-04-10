@@ -80,15 +80,38 @@ app.post('/',urlencodedParser,  function(req, res) {
   var password = req.body.password;
   console.log("post received: Username: %s Password: %s", email, password);
 
+  var query4 = "SELECT email FROM User;";
+  con.query(query4, function(err, rows) {
+    if (err) {
+      console.log("Failed to pull emails from database.")
+      console.log(err);
+      res.redirect(req.get('referer'));
+    } else {
+      console.log('Data received from Db:\n');
+      console.log(rows);
+
+      var check = false;
+
+      rows.forEach((d) => {
+        if (d.email.toLowerCase() == email.toLowerCase()) {
+          check = true;
+        }
+      });
+
+      if (!check) {
+        alerts.push({alert: "Invalid username.", type: "danger"});
+      }
+    }
+  });
+
   //checks login against database
   var request = "SELECT email, password, role FROM User WHERE email = '" + email + "'";
   con.query(request, function (err, result) {
     if (err){
       res.redirect(req.get('referer'));
     }
-    if (!result){
+    if (alerts.length != 0){
       console.log("Invalid username");
-      alerts.push({alert: "Invalid username.", type: "danger"});
       res.redirect(req.get('referer'));
     } else {
       var pw_hash = result[0]["password"];
@@ -130,6 +153,30 @@ app.post('/register',urlencodedParser,  function(req, res) {
     valid = false;
   }
 
+  var query4 = "SELECT email FROM User;";
+  con.query(query4, function(err, rows) {
+    if (err) {
+      console.log("Failed to pull emails from database.")
+      console.log(err);
+      res.redirect(req.get('referer'));
+    } else {
+      console.log('Data received from Db:\n');
+      console.log(rows);
+
+      var check = false;
+
+      rows.forEach((d) => {
+        if (d.email.toLowerCase() == email.toLowerCase()) {
+          check = true;
+        }
+      });
+
+      if (check) {
+        alerts.push({alert: "Email already exists in the database.", type: "danger"});
+      }
+    }
+  });
+
   if (valid) {
     bcrypt.hash(password, 10, function(err, hash) {
       var query = "INSERT INTO User (password, firstName, lastName, email, phoneNumber, lastLogin) "+
@@ -139,7 +186,9 @@ app.post('/register',urlencodedParser,  function(req, res) {
       con.query(query, function(err) {
         if (err) {
           console.log("Registration attempt failed");
-          alerts.push("Registration attempt failed, please try again.");
+          if (alerts.length == 0) {
+            alerts.push({alert: "Registration attempt failed, please try again.", type: "danger"});
+          }
           console.log(err);
           res.redirect(req.get('referer'));
         } else {
