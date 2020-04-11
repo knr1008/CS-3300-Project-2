@@ -23,22 +23,29 @@ var check_filter = null
 var api = express.Router();
 
 // connect to database
-while (con == null){
-  console.log('Attempting sql connection');
-  con = mysql.createPool({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USERNAME,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_DATABASE
-  });
-  console.log("MySQL Connected!");
-  // con.connect(function(err) {
-  //   if (err) {
-  //     return null
-  //   }
-  //   console.log("MySQL Connected!");
-  // });
-}
+// while (con == null){
+//   console.log('Attempting sql connection');
+//   con = mysql.createPool({
+//     host: process.env.DB_HOST,
+//     user: process.env.DB_USERNAME,
+//     password: process.env.DB_PASSWORD,
+//     database: process.env.DB_DATABASE
+//   });
+//   console.log("MySQL Connected!");
+//   // con.connect(function(err) {
+//   //   if (err) {
+//   //     return null
+//   //   }
+//   //   console.log("MySQL Connected!");
+//   // });
+// }
+const sqlite3 = require('sqlite3').verbose();
+let db = new sqlite3.Database('./db/database.db', (err) => {
+  if (err) {
+    return console.error(err.message);
+  }
+  console.log('Connected to the in-memory SQlite database.');
+});
 
 //starts app
 app.listen(8000, () => {
@@ -81,7 +88,7 @@ app.post('/',urlencodedParser,  function(req, res) {
   console.log("post received: Username: %s Password: %s", email, password);
 
   var query4 = "SELECT email FROM User;";
-  con.query(query4, function(err, rows) {
+  db.all(query4, [], (err, rows) => {
     if (err) {
       console.log("Failed to pull emails from database.")
       console.log(err);
@@ -105,8 +112,8 @@ app.post('/',urlencodedParser,  function(req, res) {
   });
 
   //checks login against database
-  var request = "SELECT email, password, role FROM User WHERE email = '" + email + "'";
-  con.query(request, function (err, result) {
+  var request = "SELECT email, password FROM User WHERE email = '" + email + "'";
+  db.all(request, [], (err, result) => {
     if (err){
       res.redirect(req.get('referer'));
     }
@@ -120,7 +127,7 @@ app.post('/',urlencodedParser,  function(req, res) {
         if (res2){
           console.log("Authenticated");
           cur_user = email;
-          cur_role = role;
+          // cur_role = role;
           console.log(cur_user)
           res.sendFile(path.join(__dirname,'./html/home.html'));
         } else {
@@ -154,7 +161,7 @@ app.post('/register',urlencodedParser,  function(req, res) {
   }
 
   var query4 = "SELECT email FROM User;";
-  con.query(query4, function(err, rows) {
+  db.all(query4, [], (err, rows) => {
     if (err) {
       console.log("Failed to pull emails from database.")
       console.log(err);
@@ -183,7 +190,7 @@ app.post('/register',urlencodedParser,  function(req, res) {
       "VALUES ('" + hash + "', '" + fname + "', '" + lname + "', '" + email + "', '" + phone + "', null);";
 
       console.log(query);
-      con.query(query, function(err) {
+      db.run(query, [], (err) => {
         if (err) {
           console.log("Registration attempt failed");
           if (alerts.length == 0) {
@@ -196,31 +203,31 @@ app.post('/register',urlencodedParser,  function(req, res) {
           alerts.push({alert: "Registered successfully!", type: "success"});
           res.sendFile(path.join(__dirname,'./html/login.html'));
 
-           //send an email to newly registered user
-          var nodemailer = require('nodemailer');
+          //  //send an email to newly registered user
+          // var nodemailer = require('nodemailer');
 
-          var transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-              user: 'cs3300project2@gmail.com',
-              pass: 'csproject2!'
-            }
-          });
+          // var transporter = nodemailer.createTransport({
+          //   service: 'gmail',
+          //   auth: {
+          //     user: 'cs3300project2@gmail.com',
+          //     pass: 'csproject2!'
+          //   }
+          // });
 
-          var mailOptions = {
-            from: 'cs3300project2@gmail.com',
-            to: email,
-            subject: 'Welcome to Buzz Marketplace!',
-            text: 'Thanks for registering an account with us!'
-          };
+          // var mailOptions = {
+          //   from: 'cs3300project2@gmail.com',
+          //   to: email,
+          //   subject: 'Welcome to Buzz Marketplace!',
+          //   text: 'Thanks for registering an account with us!'
+          // };
 
-          transporter.sendMail(mailOptions, function(error, info){
-            if (error) {
-              console.log(error);
-            } else {
-              console.log('Email sent: ' + info.response);
-            }
-          });
+          // transporter.sendMail(mailOptions, function(error, info){
+          //   if (error) {
+          //     console.log(error);
+          //   } else {
+          //     console.log('Email sent: ' + info.response);
+          //   }
+          // });
         }
       });
     });
@@ -234,7 +241,7 @@ app.post('/register',urlencodedParser,  function(req, res) {
 // PULL ==================================================================================================================================
 app.get('/pull_profile',urlencodedParser,  function(req, res) {
   console.log("Arrived on profile page.");
-  con.query("SELECT * FROM User WHERE Email = '" + cur_user + "';", function(err,rows) {
+  db.all("SELECT * FROM User WHERE Email = '" + cur_user + "';", [], (err,rows) => {
       if (err) throw err;
       console.log('Data received from Db:\n');
       console.log(rows);
@@ -244,10 +251,10 @@ app.get('/pull_profile',urlencodedParser,  function(req, res) {
 
 app.get('/pull_posts', urlencodedParser, function(req, res){
   console.log("Arrived on home page.");
-  con.query("SELECT User.firstName, User.lastName, Posts.postId, Posts.postDate, Posts.postText " +
+  db.all("SELECT User.firstName, User.lastName, Posts.postId, Posts.postDate, Posts.postText " +
             "FROM Posts " +
             "LEFT JOIN User on Posts.email = User.email " + 
-            "ORDER BY Posts.postDate ASC;" , function(err,rows) {
+            "ORDER BY Posts.postDate ASC;" , [], (err,rows) => {
       if (err) throw err;
       console.log('Data received from Db:\n');
       console.log(rows);
@@ -268,7 +275,7 @@ app.post('/update_profile',urlencodedParser,  function(req, res) {
   var query = "UPDATE User SET firstName='" + fname + "', lastName='" + lname + "', phoneNumber='" + phone + "' WHERE email='" + cur_user + "';";
   console.log(query);
 
-  con.query(query, function(err) {
+  db.all(query, [], (err) => {
     if (err) {
       console.log("Update profile attempt failed");
       alerts.push({alert: "Updating profile failed, please try again.", type: "danger"});
@@ -298,7 +305,7 @@ app.post('/update_password',urlencodedParser,  function(req, res) {
   }
 
   if (valid) {
-    con.query("SELECT password FROM User WHERE Email = '" + cur_user + "'", function (err, result) {
+    db.all("SELECT password FROM User WHERE Email = '" + cur_user + "'", [], (err, result) => {
       if (err){
         res.redirect(req.get('referer'));
       }
@@ -309,7 +316,7 @@ app.post('/update_password',urlencodedParser,  function(req, res) {
           bcrypt.hash(newPass, 10, function(err, hash) {
             var query = "UPDATE User SET password='" + hash + "' WHERE email='" + cur_user + "';";
             console.log(query);
-            con.query(query, function(err) {
+            db.run(query, [], function(err) {
               if (err) {
                 console.log("Update password attempt failed");
                 alerts.push({alert: "Updating password failed, please try again.", type: "danger"});
@@ -339,10 +346,10 @@ app.post('/submit_post', urlencodedParser, function(req, res) {
   var postText = req.body.postText;
 
   if (postText.length > 0) {
-    var query = "INSERT INTO Posts (email, role, postText) VALUES ('" + cur_user + "', '" + cur_role + "', '" + postText + "');";
+    var query = "INSERT INTO Posts (email, postText) VALUES ('" + cur_user + "', '" + postText + "');";
     console.log(query);
 
-    con.query(query, function(err) {
+    db.run(query, [], function(err) {
       if (err) {
         console.log("Submit post attempt failed.");
         alerts.push({alert: "Posting failed, please try again.", type: "danger"});
@@ -355,3 +362,284 @@ app.post('/submit_post', urlencodedParser, function(req, res) {
   }
   res.sendFile(path.join(__dirname,'./html/home.html'));
 });
+// // LOGIN =========================================================================================================================
+// app.post('/',urlencodedParser,  function(req, res) {
+//   var email = req.body.email;
+//   var password = req.body.password;
+//   console.log("post received: Username: %s Password: %s", email, password);
+
+//   var query4 = "SELECT email FROM User;";
+//   con.query(query4, function(err, rows) {
+//     if (err) {
+//       console.log("Failed to pull emails from database.")
+//       console.log(err);
+//       res.redirect(req.get('referer'));
+//     } else {
+//       console.log('Data received from Db:\n');
+//       console.log(rows);
+
+//       var check = false;
+
+//       rows.forEach((d) => {
+//         if (d.email.toLowerCase() == email.toLowerCase()) {
+//           check = true;
+//         }
+//       });
+
+//       if (!check) {
+//         alerts.push({alert: "Invalid username.", type: "danger"});
+//       }
+//     }
+//   });
+
+//   //checks login against database
+//   var request = "SELECT email, password, role FROM User WHERE email = '" + email + "'";
+//   con.query(request, function (err, result) {
+//     if (err){
+//       res.redirect(req.get('referer'));
+//     }
+//     if (alerts.length != 0){
+//       console.log("Invalid username");
+//       res.redirect(req.get('referer'));
+//     } else {
+//       var pw_hash = result[0]["password"];
+//       var email = result[0]["email"];
+//       bcrypt.compare(password, pw_hash, function(err, res2) {
+//         if (res2){
+//           console.log("Authenticated");
+//           cur_user = email;
+//           cur_role = role;
+//           console.log(cur_user)
+//           res.sendFile(path.join(__dirname,'./html/home.html'));
+//         } else {
+//           console.log("Invalid password");
+//           alerts.push({alert: "Invalid password.", type: "danger"});
+//           res.redirect(req.get('referer'));
+//         }
+//       });
+//     }
+//   });
+// });
+
+// // REGISTER ===========================================================================================================================================================
+// app.post('/register',urlencodedParser,  function(req, res) {
+//   var fname = req.body.fname;
+//   var lname = req.body.lname;
+//   var email = req.body.email;
+//   var phone = req.body.phone;
+//   var password = req.body.pass;
+//   var confirmpass = req.body.confirmpass;
+//   console.log(req.body);
+
+//   var valid = true;
+//   if (password.length < 8 || password.length > 20) {
+//     alerts.push({alert: "Password must have a length between 8 and 20 characters.", type: "danger"});
+//     valid = false;
+//   }
+//   if (password != confirmpass) {
+//     alerts.push({alert: "Passwords do not match.", type: "danger"});
+//     valid = false;
+//   }
+
+//   var query4 = "SELECT email FROM User;";
+//   con.query(query4, function(err, rows) {
+//     if (err) {
+//       console.log("Failed to pull emails from database.")
+//       console.log(err);
+//       res.redirect(req.get('referer'));
+//     } else {
+//       console.log('Data received from Db:\n');
+//       console.log(rows);
+
+//       var check = false;
+
+//       rows.forEach((d) => {
+//         if (d.email.toLowerCase() == email.toLowerCase()) {
+//           check = true;
+//         }
+//       });
+
+//       if (check) {
+//         alerts.push({alert: "Email already exists in the database.", type: "danger"});
+//       }
+//     }
+//   });
+
+//   if (valid) {
+//     bcrypt.hash(password, 10, function(err, hash) {
+//       var query = "INSERT INTO User (password, firstName, lastName, email, phoneNumber, lastLogin) "+
+//       "VALUES ('" + hash + "', '" + fname + "', '" + lname + "', '" + email + "', '" + phone + "', null);";
+
+//       console.log(query);
+//       con.query(query, function(err) {
+//         if (err) {
+//           console.log("Registration attempt failed");
+//           if (alerts.length == 0) {
+//             alerts.push({alert: "Registration attempt failed, please try again.", type: "danger"});
+//           }
+//           console.log(err);
+//           res.redirect(req.get('referer'));
+//         } else {
+//           console.log("Registration success");
+//           alerts.push({alert: "Registered successfully!", type: "success"});
+//           res.sendFile(path.join(__dirname,'./html/login.html'));
+
+//            //send an email to newly registered user
+//           var nodemailer = require('nodemailer');
+
+//           var transporter = nodemailer.createTransport({
+//             service: 'gmail',
+//             auth: {
+//               user: 'cs3300project2@gmail.com',
+//               pass: 'csproject2!'
+//             }
+//           });
+
+//           var mailOptions = {
+//             from: 'cs3300project2@gmail.com',
+//             to: email,
+//             subject: 'Welcome to Buzz Marketplace!',
+//             text: 'Thanks for registering an account with us!'
+//           };
+
+//           transporter.sendMail(mailOptions, function(error, info){
+//             if (error) {
+//               console.log(error);
+//             } else {
+//               console.log('Email sent: ' + info.response);
+//             }
+//           });
+//         }
+//       });
+//     });
+//   } else {
+//     console.log("Invalid input");
+//     console.log(alerts)
+//     res.redirect(req.get('referer'));
+//   }
+// });
+
+// // PULL ==================================================================================================================================
+// app.get('/pull_profile',urlencodedParser,  function(req, res) {
+//   console.log("Arrived on profile page.");
+//   con.query("SELECT * FROM User WHERE Email = '" + cur_user + "';", function(err,rows) {
+//       if (err) throw err;
+//       console.log('Data received from Db:\n');
+//       console.log(rows);
+//       res.json(rows);
+//   });
+// });
+
+// app.get('/pull_posts', urlencodedParser, function(req, res){
+//   console.log("Arrived on home page.");
+//   con.query("SELECT User.firstName, User.lastName, Posts.postId, Posts.postDate, Posts.postText " +
+//             "FROM Posts " +
+//             "LEFT JOIN User on Posts.email = User.email " + 
+//             "ORDER BY Posts.postDate ASC;" , function(err,rows) {
+//       if (err) throw err;
+//       console.log('Data received from Db:\n');
+//       console.log(rows);
+//       res.json(rows);
+//   });
+// });
+// app.get('/pull_alerts', urlencodedParser, function(req, res){
+//   console.log(alerts);
+//   res.json(alerts);
+//   alerts = [];
+// });
+// // UPDATE ======================================================================================================================
+// app.post('/update_profile',urlencodedParser,  function(req, res) {
+//   var fname = req.body.fname;
+//   var lname = req.body.lname;
+//   var phone = req.body.phone;
+  
+//   var query = "UPDATE User SET firstName='" + fname + "', lastName='" + lname + "', phoneNumber='" + phone + "' WHERE email='" + cur_user + "';";
+//   console.log(query);
+
+//   con.query(query, function(err) {
+//     if (err) {
+//       console.log("Update profile attempt failed");
+//       alerts.push({alert: "Updating profile failed, please try again.", type: "danger"});
+//       res.redirect(req.get('referer'));
+//     } else {
+//       console.log("Update profile success");
+//       alerts.push({alert: "Updated profile successfully!", type: "success"});
+//       res.sendFile(path.join(__dirname,'./html/profile.html'));
+//     }
+//   });
+// });
+
+// app.post('/update_password',urlencodedParser,  function(req, res) {
+//   var currPass = req.body.currPass;
+//   var newPass = req.body.newPass;
+//   var newPass2 = req.body.newPass2;
+//   console.log(req.body);
+
+//   var valid = true;
+//   if (newPass.length < 8 || newPass.length > 20) {
+//     alerts.push({alert: "Password must have a length between 8 and 20 characters.", type: "danger"});
+//     valid = false;
+//   }
+//   if (newPass != newPass2) {
+//     alerts.push({alert: "Passwords do not match.", type: "danger"});
+//     valid = false;
+//   }
+
+//   if (valid) {
+//     con.query("SELECT password FROM User WHERE Email = '" + cur_user + "'", function (err, result) {
+//       if (err){
+//         res.redirect(req.get('referer'));
+//       }
+//       var pw_hash = result[0]["password"];
+//       bcrypt.compare(currPass, pw_hash, function(err, res2) {
+//         if (res2){
+//           console.log("Password authenticated");
+//           bcrypt.hash(newPass, 10, function(err, hash) {
+//             var query = "UPDATE User SET password='" + hash + "' WHERE email='" + cur_user + "';";
+//             console.log(query);
+//             con.query(query, function(err) {
+//               if (err) {
+//                 console.log("Update password attempt failed");
+//                 alerts.push({alert: "Updating password failed, please try again.", type: "danger"});
+//                 res.redirect(req.get('referer'));
+//               } else {
+//                 console.log("Update password success");
+//                 alerts.push({alert: "Updated password successfully!", type: "success"});
+//                 res.sendFile(path.join(__dirname,'./html/profile.html'));
+//               }
+//             });
+//           });
+//         } else {
+//           console.log("Invalid password");
+//           alerts.push({alert: "Invalid password, please try again.", type: "danger"});
+//           res.redirect(req.get('referer'));
+//         }
+//       });
+//     });
+//   } else {
+//     console.log("Invalid input");
+//     res.redirect(req.get('referer'));
+//   }
+// });
+// // SUBMIT ====================================================================================================================================
+// app.post('/submit_post', urlencodedParser, function(req, res) {
+//   console.log("Received post response");
+//   var postText = req.body.postText;
+
+//   if (postText.length > 0) {
+//     var query = "INSERT INTO Posts (email, role, postText) VALUES ('" + cur_user + "', '" + cur_role + "', '" + postText + "');";
+//     console.log(query);
+
+//     con.query(query, function(err) {
+//       if (err) {
+//         console.log("Submit post attempt failed.");
+//         alerts.push({alert: "Posting failed, please try again.", type: "danger"});
+//         console.log(err);
+//       } else {
+//         console.log("Submit post success.");
+//         alerts.push({alert: "Posted successfully!", type: "success"});
+//       }
+//     });
+//   }
+//   res.sendFile(path.join(__dirname,'./html/home.html'));
+// });
