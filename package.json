@@ -1,25 +1,30 @@
 {
-  "name": "junior-design-fall-2019",
+  "name": "cs-3300-prj2",
   "version": "1.0.0",
-  "description": "Seeds of Health Empowerment",
+  "description": "CS 3300 Project 2",
   "main": "app.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.gatech.edu/pchoe6/Junior-Design-Fall-2019.git"
-  },
-  "author": "Team SApp",
-  "license": "ISC",
   "dependencies": {
-    "bcrypt": "^3.0.8",
     "bcryptjs": "^2.4.3",
+    "bcrypt": "^3.0.8",
     "dotenv": "^8.2.0",
-    "express": "^4.17.1",
     "express-validator": "^6.4.0",
+    "express": "^4.17.1",
     "free-mobile-sms-api": "^1.0.4",
     "mysql": "^2.18.1",
     "nodemailer": "^6.4.6"
-  }
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \\\"Error: no test specified\\\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/knr1008/CS-3300-Project-2.git"
+  },
+  "author": "Team 2",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/knr1008/CS-3300-Project-2/issues"
+  },
+  "homepage": "https://github.com/knr1008/CS-3300-Project-2#readme"
 }

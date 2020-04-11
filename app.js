@@ -45,7 +45,7 @@ app.listen(8000, () => {
   console.log('Project2 listening on port 8000!');
 });
 
-//loads home page on start up
+//loads login page on start up
 app.get('/', function (req, res) {
   res.sendFile(path.join(__dirname,'./html/login.html'));
 });

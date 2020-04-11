@@ -1,4 +1,4 @@
--- need a database to use   previously used ->       use histor72_sapp;
+-->use DB_USERNAME;
 
 CREATE TABLE User (
 	email VARCHAR(50) NOT NULL,
