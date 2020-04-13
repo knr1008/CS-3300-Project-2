@@ -34,19 +34,17 @@
             <div class="container" style="background-color: #ffffff;padding: 0px 20px;padding-right: 1px;">
                 
                     <form action="home.html">
-                        <div class="heading" id="create">
-                            <h2 class="text-center" style="color: rgb(207,181,59)">Title of Post</h2>
+                        <div class="heading row justify-content-center">
+                            <h3 class="text-center" id="postTitle" style="color: rgb(207,181,59)"></h3>
                         </div>
-                        <div class="heading" id="create">
-                            <h2 class="text-center" style="color: rgb(207,181,59)">Image</h2>
-                        </div>
-                        <div class="heading" id="create">
-                            <h2 class="text-center" style="color: rgb(207,181,59)">Description</h2>
-                        </div>
-                        <div class="heading" id="create">
-                            <h2 class="text-center" style="color: rgb(207,181,59)">Phone Number and/or Email</h2>
-                        </div>
-                        <button class="btn btn-outline-warning" type="submit" style="padding-top: 6px;margin-top: 30px; ">Return</button>
+                        <div class= "row justify-content-center" style="margin-top: 20px;"><img id="image" style="height: 400px; width: 300px;"></img></div>
+                        <div class="row" style="margin-top: 20px;"><h5><strong>Description: </strong></h5></div>
+                        <h5 style="text-align: left;" id="postText"></h5>
+                        <div class="row" style="margin-top: 20px;"><h5><strong>Phone Number: </strong></h5></div>
+                        <h5 style="text-align: left;" id="phone"></h5>
+                        <div class="row"><h5><strong>Email: </strong></h5></div>
+                        <h5 style="text-align: left;" id="email"></h5>
+                        <button class="btn btn-outline-warning" type="submit" style="padding-top: 6px;margin-top: 30px;">Return</button>
                     </form>
                 
             </div>
@@ -86,12 +84,42 @@
     <script src="assets/js/theme.js"></script>
     <script>
         $(document).ready(function(){
-            $.get("/pull_alerts", function(data, status){
-                var heading = $("#create");
-                data.forEach((d) => {
-                    heading.after("<div class=\"alert alert-" + d.type + "\" role=\"alert\"><strong>" + d.alert + "</strong><span class=\"close\" onclick=\"this.parentElement.style.display='none';\">&times;</span></div>");
-                });
-            });
+          var contact;
+
+          $.get("/pull_individual_post", function(data, status){
+              data.forEach((d) => {
+                  document.getElementById('postTitle').innerHTML = d.title;
+                  document.getElementById('postText').innerHTML = d.postText;
+                  document.getElementById('image').src = "/assets/uploadedImages/" + d.postId + ".png";
+
+                  contact = d.notification;
+
+                  if (contact == 'Phone') {
+                    $.get("/pull_contact_choice", function(data, status){
+                      data.forEach((d) => {
+                          document.getElementById('phone').innerHTML = d.phoneNumber;
+                          document.getElementById('email').innerHTML = "Not listed.";
+                      });
+                    });
+                  } 
+                  if (contact == 'Email') {
+                    $.get("/pull_contact_choice", function(data, status){
+                      data.forEach((d) => {
+                          document.getElementById('phone').innerHTML = "Not listed.";
+                          document.getElementById('email').innerHTML = d.email;
+                      });
+                    });
+                  } 
+                  if (contact == 'Both') {
+                    $.get("/pull_contact_choice", function(data, status){
+                      data.forEach((d) => {
+                          document.getElementById('phone').innerHTML = d.phoneNumber;
+                          document.getElementById('email').innerHTML = d.email;
+                      });
+                    });
+                  }
+              });
+          });
         });
     </script>
 </body>

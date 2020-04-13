@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="assets/css/Login-Form-Dark.css">
 </head>
 
-<body><div class="login-clean" style="background-color: rgb(207,181,59);">
+<body style="background-color: black;"><div class="login-clean" style="background-color: rgb(207,181,59);">
         <form method="post" action="/register" style="background-color: black;">
             <h1 style="color: rgb(207,181,59);">&nbsp;Registration</h1>
             <div class="illustration"></div>
@@ -37,7 +37,7 @@
     <script>
         $(document).ready(function(){
             $.get("/pull_alerts", function(data, status){
-                var header = $("h1");
+                var header = $(".illustration");
                 data.forEach((d) => {
                     header.after("<div class=\"alert alert-" + d.type + "\" role=\"alert\"><strong>" + d.alert + "</strong><span class=\"close\" onclick=\"this.parentElement.style.display='none';\">&times;</span></div>");
                 });

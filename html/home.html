@@ -33,18 +33,19 @@
         <section class="portfolio-block block-intro" style="padding: 32px;padding-top: 70px;padding-bottom: 40px;">
             <div class="container" style="background-color: #ffffff;padding: 0px 20px;padding-right: 1px;">
                 
-                    <form method="post" action="/submit_post">
+                    <form method="post" enctype="multipart/form-data" action="/submit_post">
                         <div class="heading" id="create">
                             <h2 class="text-center" style="color: rgb(207,181,59)">Create a Post</h2>
                         </div>
-                        <div class="heading" id="create">
-                            <h5 class="text-center">Upload an Image</h5>
-                        </div>
-                        <label>Description</label>
-                        <textarea name="postText" style="height: 100px; color: rgb(207,181,59)"class="form-control" placeholder="Write something...." required></textarea>
-                        <label>Contact Choice</label>
+                        <div class="row"><label>Title: </label></div>
+                        <textarea name="postTitle" class="form-control" placeholder="Write something...." required></textarea>
+                        <div class="row" style="margin-top: 20px;"><label>Upload Image: </label></div>
+                        <div class="row"><input type="file" name="file" required></div>
+                        <div class="row" style="margin-top: 20px;"><label>Description: </label></div>
+                        <textarea name="postText" style="height: 100px;"class="form-control" placeholder="Write something...." required></textarea>
+                        <div class="row" style="margin-top: 20px;"><label>Contact Choice: </label></div>
                         <div class="form-group">
-                            <select class="form-control" required>
+                            <select class="form-control" name="contactChoice" required>
                                 <option value="Email">Email</option>
                                 <option value="Phone">Phone Number</option>
                                 <option value="Both">Both</option>
@@ -60,13 +61,6 @@
                 <div class="work-experience group">
                     <div class="heading" id="feed">
                         <h2 class="text-center" style="color: rgb(207,181,59)">Buzz Marketplace</h2>
-                    </div>
-                    <!-- Individual posts will appear below buzz marketplace, they will display title and image. Clicking on a post will 
-                    bring the user to another page to see all of the details (title, image, description, contact info)-->
-                    <div class="heading">
-                        <h5 class="text-center" style="color: rgb(207,181,59)">Individual Post (Clickable)</h5>
-                        <h5 class="text-center" style="color: rgb(207,181,59)">Title</h5>
-                        <h5 class="text-center" style="color: rgb(207,181,59)">Image</h5>
                     </div>
                 </div>
             </div>
@@ -109,13 +103,13 @@
             $.get("/pull_posts", function(data, status){
                 var heading = $("div#feed");
                 data.forEach((d) => {
-                    heading.after("<div class=\"item\" id=\"" + d.postId + "\"><div class=\"row\"><div class=\"col-md-6 d-md-flex d-lg-flex justify-content-md-start align-items-md-center justify-content-lg-start align-items-lg-center\"><h3 class=\"text-left\" style=\"font-size: 20px;\">" + d.firstName + " " + d.lastName + "</h3></div><div class=\"col d-md-flex d-lg-flex justify-content-md-end align-items-md-center justify-content-lg-center align-items-lg-center\"><span class=\"d-lg-flex justify-content-lg-center align-items-lg-center period\" style=\"font-size: 15px;\">&nbsp;" + formatDate(d.postDate) + "</span></div></div><p class=\"text-muted\" style=\"font-size: 20px\">" + d.postText + "</p><form action=\"/posts\" method=\"post\" style=\"all: unset\"><input value=\"" + d.postId + "\" name=\"postId\" style=\"display: none\"></input><button style=\"background: transparent;border: none;\">See comments...</button></form></div>");
+                    heading.after("<div class=\"item\" id=\"" + d.postId + "\"><div class=\"row justify-content-center\"><div><h2>" + d.title + "</h2></div></div><div class=\"row justify-content-center\"><img src=\"assets/uploadedImages/" + d.postId + ".png\" style=\"width: 150px; height: 200px;\"></img></div><div class=\"row justify-content-center\"><form action=\"/posts\" method=\"post\" style=\"all: unset\"><input value=\"" + d.postId + "\" name=\"postId\" style=\"display: none\"></input><button class=\"btn-outline-warning\">Check Out Details</button></form></div></div>");
                 });
                 if (data.length == 0) {
-                    heading.after("<br><h5 class=\"no-result\">No posts</h5>");
+                    heading.after("<br><h5 class=\"no-result text-center\" style=\"color: rgb(207,181,59)\">There are no posts.</h5>");
                 }
             });
-
+            
             $.get("/pull_alerts", function(data, status){
                 var heading = $("#create");
                 data.forEach((d) => {
