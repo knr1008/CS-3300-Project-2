@@ -84,7 +84,7 @@ app.post('/',urlencodedParser,  function(req, res) {
     if (err) {
       console.log("Failed to pull emails from database.")
       console.log(err);
-      res.redirect(req.get('referer'));
+      res.sendFile(path.join(__dirname,'./html/login.html'));
     } else {
       console.log('Data received from Db:\n');
       console.log(rows);
@@ -107,11 +107,11 @@ app.post('/',urlencodedParser,  function(req, res) {
   var request = "SELECT email, password FROM User WHERE email = '" + email + "'";
   db.all(request, [], (err, result) => {
     if (err){
-      res.redirect(req.get('referer'));
+      res.sendFile(path.join(__dirname,'./html/login.html'));
     }
     if (alerts.length != 0){
       console.log("Invalid username");
-      res.redirect(req.get('referer'));
+      res.sendFile(path.join(__dirname,'./html/login.html'));
     } else {
       var pw_hash = result[0]["password"];
       var email = result[0]["email"];
@@ -124,7 +124,7 @@ app.post('/',urlencodedParser,  function(req, res) {
         } else {
           console.log("Invalid password");
           alerts.push({alert: "Invalid password.", type: "danger"});
-          res.redirect(req.get('referer'));
+          res.sendFile(path.join(__dirname,'./html/login.html'));
         }
       });
     }
@@ -298,7 +298,7 @@ app.post('/update_profile',urlencodedParser,  function(req, res) {
     if (err) {
       console.log("Update profile attempt failed");
       alerts.push({alert: "Updating profile failed, please try again.", type: "danger"});
-      res.redirect(req.get('referer'));
+      res.sendFile(path.join(__dirname,'./html/update-info.html'));
     } else {
       console.log("Update profile success");
       alerts.push({alert: "Updated profile successfully!", type: "success"});
@@ -327,7 +327,7 @@ app.post('/update_password',urlencodedParser,  function(req, res) {
     db.all("SELECT password FROM User WHERE Email = '" + cur_user + "'", [], (err, result) => {
       if (err){
         alerts.push({alert: "Error has occurred, please try again.", type: "danger"});
-        res.redirect(req.get('referer'));
+        res.sendFile(path.join(__dirname,'./html/update-password.html'));
       }
       var pw_hash = result[0]["password"];
       bcrypt.compare(currPass, pw_hash, function(err, res2) {
@@ -340,7 +340,7 @@ app.post('/update_password',urlencodedParser,  function(req, res) {
               if (err) {
                 console.log("Update password attempt failed");
                 alerts.push({alert: "Updating password failed, please try again.", type: "danger"});
-                res.redirect(req.get('referer'));
+                res.sendFile(path.join(__dirname,'./html/update-password.html'));
               } else {
                 console.log("Update password success");
                 alerts.push({alert: "Updated password successfully!", type: "success"});
@@ -351,13 +351,13 @@ app.post('/update_password',urlencodedParser,  function(req, res) {
         } else {
           console.log("Invalid password");
           alerts.push({alert: "Invalid password, please try again.", type: "danger"});
-          res.redirect(req.get('referer'));
+          res.sendFile(path.join(__dirname,'./html/update-password.html'));
         }
       });
     });
   } else {
     console.log("Invalid input");
-    res.redirect(req.get('referer'));
+    res.sendFile(path.join(__dirname,'./html/update-password.html'));
   }
 });
 // SUBMIT ====================================================================================================================================
