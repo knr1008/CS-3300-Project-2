@@ -135,7 +135,7 @@ app.post('/',urlencodedParser,  function(req, res) {
 app.post('/register',urlencodedParser,  function(req, res) {
   var fname = req.body.fname;
   var lname = req.body.lname;
-  var email = req.body.email;
+  var email = req.body.email.toLowerCase();
   var phone = req.body.phone;
   var password = req.body.pass;
   var confirmpass = req.body.confirmpass;
@@ -164,7 +164,7 @@ app.post('/register',urlencodedParser,  function(req, res) {
       var check = false;
 
       rows.forEach((d) => {
-        if (d.email.toLowerCase() == email.toLowerCase()) {
+        if (d.email.toLowerCase() == email) {
           check = true;
         }
       });
@@ -497,11 +497,20 @@ app.post('/deletepost', urlencodedParser, function(req, res) {
       console.log("Failed to delete post.")
       console.log(err);
       alerts.push({alert: "Failed to delete your post. Try again", type: "danger"});
-      res.redirect(req.get('referer'));
     } else {
       console.log("Succeeded in deleting post.");
-      alerts.push({alert: "Successfully deleted post.", type: "success"});
-      res.redirect(req.get('referer'));
+      const targetPath = path.join(__dirname, "./html/assets/uploadedImages/" + cur_post + ".png");
+      fs.unlink(targetPath, err => {
+        if (err) {
+          console.log(err);
+          alerts.push({alert: "Failed to delete image.", type: "danger"});
+        } else {
+          console.log("Successfully deleted image");
+          alerts.push({alert: "Successfully deleted post.", type: "success"});
+        }
+      });
     }
   });
+
+  res.sendFile(path.join(__dirname,'./html/myposts.html'));
 });
