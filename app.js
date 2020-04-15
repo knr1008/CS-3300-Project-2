@@ -262,11 +262,17 @@ app.get('/pull_individual_post', urlencodedParser, function(req, res) {
 });
 
 app.get('/pull_contact_choice', urlencodedParser, function(req, res) {
-  db.all("SELECT * FROM User WHERE email='" + cur_user + "';", [], (err, row) => {
+  var email;
+
+  db.get("SELECT * FROM Posts WHERE postId='" + cur_post + "';", [], (err, row1) => {
     if (err) throw err;
-    console.log('Data received from Db:\n');
-    console.log(row);
-    res.json(row);
+    email = row1.email;
+    db.all("SELECT * FROM User WHERE email='" + email + "';", [], (err, row2) => {
+      if (err) throw err;
+      console.log('Data received from Db:\n');
+      console.log(row2);
+      res.json(row2);
+    });
   });
 });
 
