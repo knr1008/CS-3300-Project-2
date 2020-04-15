@@ -75,7 +75,7 @@ app.post("/posts", urlencodedParser, function(req, res) {
 
 // LOGIN =========================================================================================================================
 app.post('/',urlencodedParser,  function(req, res) {
-  var email = req.body.email;
+  var email = req.body.email.toLowerCase();
   var password = req.body.password;
   console.log("post received: Username: %s Password: %s", email, password);
 
@@ -92,7 +92,7 @@ app.post('/',urlencodedParser,  function(req, res) {
       var check = false;
 
       rows.forEach((d) => {
-        if (d.email.toLowerCase() == email.toLowerCase()) {
+        if (d.email.toLowerCase() == email) {
           check = true;
         }
       });
