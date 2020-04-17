@@ -75,33 +75,9 @@ app.post("/posts", urlencodedParser, function(req, res) {
 
 // LOGIN =========================================================================================================================
 app.post('/',urlencodedParser,  function(req, res) {
-  var email = req.body.email.toLowerCase();
+  var email = req.body.email;
   var password = req.body.password;
   console.log("post received: Username: %s Password: %s", email, password);
-
-  var query4 = "SELECT email FROM User;";
-  db.all(query4, [], (err, rows) => {
-    if (err) {
-      console.log("Failed to pull emails from database.")
-      console.log(err);
-      res.sendFile(path.join(__dirname,'./html/login.html'));
-    } else {
-      console.log('Data received from Db:\n');
-      console.log(rows);
-
-      var check = false;
-
-      rows.forEach((d) => {
-        if (d.email.toLowerCase() == email) {
-          check = true;
-        }
-      });
-
-      if (!check) {
-        alerts.push({alert: "Invalid username.", type: "danger"});
-      }
-    }
-  });
 
   //checks login against database
   var request = "SELECT email, password FROM User WHERE email = '" + email + "'";
@@ -109,8 +85,9 @@ app.post('/',urlencodedParser,  function(req, res) {
     if (err){
       res.sendFile(path.join(__dirname,'./html/login.html'));
     }
-    if (alerts.length != 0){
+    if (result.length == 0){
       console.log("Invalid username");
+      alerts.push({alert: "Invalid username.", type: "danger"});
       res.sendFile(path.join(__dirname,'./html/login.html'));
     } else {
       var pw_hash = result[0]["password"];
@@ -135,7 +112,7 @@ app.post('/',urlencodedParser,  function(req, res) {
 app.post('/register',urlencodedParser,  function(req, res) {
   var fname = req.body.fname;
   var lname = req.body.lname;
-  var email = req.body.email.toLowerCase();
+  var email = req.body.email;
   var phone = req.body.phone;
   var password = req.body.pass;
   var confirmpass = req.body.confirmpass;
@@ -164,7 +141,7 @@ app.post('/register',urlencodedParser,  function(req, res) {
       var check = false;
 
       rows.forEach((d) => {
-        if (d.email.toLowerCase() == email) {
+        if (d.email.toLowerCase() == email.toLowerCase()) {
           check = true;
         }
       });
